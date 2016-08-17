@@ -1,0 +1,246 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Customized Map</title>
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+        <meta charset="utf-8">
+        <script src="bootstrap/js/jquery.min.js" type="text/javascript"></script>
+        <script src="bootstrap/js/bootstrap.js" type="text/javascript"></script>
+        <link href="bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css"/>
+        <style>
+            html, body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            #map {
+                height: 100%;
+            }
+            #floating-panel {
+                position: absolute;
+                top: 10px;
+                left: 10%;
+                z-index: 5;
+                background-color: #fff;
+                padding: 5px;
+
+                text-align: center;
+
+                line-height: 30px;
+                padding-left: 10px;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+        <script>
+            var markerpos, map2, vals = "Barrier";
+            var markersall = [];
+            function initMap() {
+                var map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 12,
+                    center: {lat: 31.5546, lng: 74.3572},
+                    disableDefaultUI: true,
+                    mapTypeControl: true,
+                    mapTypeControlOptions: {
+                        style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+                        position: google.maps.ControlPosition.TOP_CENTER
+                    },
+                    zoomControl: true,
+                    zoomControlOptions: {
+                        position: google.maps.ControlPosition.LEFT_CENTER
+                    },
+                    scaleControl: true,
+                    streetViewControl: true,
+                    streetViewControlOptions: {
+                        position: google.maps.ControlPosition.LEFT_TOP
+                    },
+                    fullscreenControl: true
+
+                });
+                map2 = map;
+                google.maps.event.addListener(map, 'dblclick', function (e)
+                {
+
+                })
+                google.maps.event.addListener(map, 'click', function (e) {
+                    placeMarker(e.latLng, map);
+                });
+                function placeMarker(position, map) {
+                    $("#myModal").modal("show");
+                    markerpos = position;
+
+                }
+                $("#addMarker").click(function () {
+                    if (vals == "Barrier")
+                    {
+                        var barr = "icons/tape.png";
+                        var marker = new google.maps.Marker({
+                            position: markerpos,
+                            map: map2,
+                            title: "Barrier",
+                            icon: barr
+                        });
+                        markersall.push(marker);
+                        $("#myModal").modal("hide");
+                    }
+                    if (vals == "Policeman")
+                    {
+                        var barr = "icons/cap.png";
+                        var marker = new google.maps.Marker({
+                            position: markerpos,
+                            map: map2,
+                            title: "Policeman",
+                            icon: barr
+                        });
+
+                        markersall.push(marker);
+                        $("#myModal").modal("hide");
+                    }
+
+                    if (vals == "Important Point")
+                    {
+                        var barr = "icons/police-car.png";
+                        var marker = new google.maps.Marker({
+                            position: markerpos,
+                            map: map2,
+                            title: "Important Point",
+                            icon: barr
+                        });
+
+                        markersall.push(marker);
+                        $("#myModal").modal("hide");
+                    }
+
+                    if (vals == "Other")
+                    {
+                        var barr = "icons/police-car.png";
+                        var marker = new google.maps.Marker({
+                            position: markerpos,
+                            map: map2,
+                            title: "Other",
+                        });
+
+                        markersall.push(marker);
+                        $("#myModal").modal("hide");
+                    }
+                });
+
+                var pos;
+
+                // Try HTML5 geolocation.
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function (position) {
+                        pos = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        var image = 'icons/badge.png';
+                        var beachMarker = new google.maps.Marker({
+                            position: pos,
+                            map: map,
+                            icon: image,
+                            title: position.coords.latitude,
+                        });
+
+                        markersall.push(beachMarker);
+
+                        map.setCenter(pos);
+                    }, function () {
+                        handleLocationError(true, infoWindow, map.getCenter());
+                    });
+                } else {
+                    // Browser doesn't support Geolocation
+                    handleLocationError(false, infoWindow, map.getCenter());
+                }
+                var drawingManager = new google.maps.drawing.DrawingManager({
+                    drawingMode: google.maps.drawing.OverlayType.HAND,
+                    drawingControl: true,
+                    drawingControlOptions: {
+                        position: google.maps.ControlPosition.TOP_CENTER,
+                        drawingModes: ['circle', 'polygon', 'polyline', 'rectangle']
+                    },
+                    circleOptions: {
+                        fillColor: '#ffff00',
+                        fillOpacity: 0.2,
+                        strokeWeight: 5,
+                        clickable: false,
+                        editable: true,
+                        zIndex: 1
+                    }
+                });
+                drawingManager.setMap(map);
+            }
+
+            function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+                infoWindow.setPosition(pos);
+                infoWindow.setContent(browserHasGeolocation ?
+                        'Error: The Geolocation service failed.' :
+                        'Error: Your browser doesn\'t support geolocation.');
+            }
+            function myvalue(value)
+            {
+                vals = value;
+            }
+            function setMapOnAll(map) {
+                for (var i = 0; i < markersall.length; i++) {
+                    markersall[i].setMap(map);
+                }
+            }
+            function clearMarkers() {
+                setMapOnAll(null);
+            }
+
+            function showMarkers() {
+                setMapOnAll(map2);
+            }
+
+            
+            function deleteMarkers() {
+                clearMarkers();
+                markersall = [];
+            }
+        </script>
+        <script async defer
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZsIAB6Wuor6P2ByJMjto6pZ6g8enDJ84&signed_in=true&libraries=drawing&callback=initMap&language=ur&region=PK">
+        </script>
+        <div id="floating-panel" class="bg-info">
+            <input onclick="clearMarkers();" type="button" class="btn btn-default" value="Hide Markers">
+            <input onclick="showMarkers();" type="button" class="btn btn-default" value="Show All Markers">
+            <input onclick="deleteMarkers();" type="button" class="btn btn-default" value="Delete Markers">
+        </div>
+        <div id="myModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Modal Header</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="sel1">Select list:</label>
+                                <select onchange="myvalue(this.value)" class="form-control" id="sel1">
+                                    <option>Barrier</option>
+                                    <option>Policeman</option>
+                                    <option>Important Point</option>
+                                    <option>Other</option>
+                                </select>
+
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="addMarker" class="btn btn-default">Add Marker</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </body>
+</html>
